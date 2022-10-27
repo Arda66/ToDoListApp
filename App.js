@@ -5,7 +5,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -15,14 +14,19 @@ import {
 } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import EditTask from './components/screen/EditTask';
+import {useNavigation} from '@react-navigation/native';
 
-// ASYNC STORAGE EKLE GELİNCE
 const App = () => {
   const [List, setList] = useState([]);
   const [Task, setTask] = useState('');
   const [isDeleted, setisDeleted] = useState(false);
   const [currIndex, setcurrIndex] = useState(null);
-
+  const Stack = createNativeStackNavigator();
+  global.temp_Activeness = false;
   useEffect(() => {
     AsyncStorage.getItem('TaskList')
       .then(data => {
@@ -32,12 +36,13 @@ const App = () => {
         console.log(err);
       });
   }, []);
+
   const renderItem = ({item, index}) => {
     return (
       <View style={styles.ItemWrapper}>
         <Text
           style={[
-            {maxWidth: '90%', color: 'black', letterSpacing: 0.2},
+            {maxWidth: '75%', color: 'black', letterSpacing: 0.2},
             isDeleted === true &&
               index == currIndex && {
                 textDecorationLine: 'line-through',
@@ -45,6 +50,17 @@ const App = () => {
           ]}>
           {index + 1}-) {item}
         </Text>
+        <TouchableOpacity
+          style={{position: 'absolute', left: '80%'}}
+          onPress={() => {
+            navigation.navigate('EditTask', {
+              Task: item,
+              index: index,
+              NewList: List,
+            });
+          }}>
+          <AntDesignIcon name="edit" size={30} color="gray" />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             DeleteItem(item, index);
@@ -90,6 +106,8 @@ const App = () => {
           'This task is already added.',
           'Please add different task.',
         );
+        setTask('');
+        Keyboard.dismiss();
       } else {
         setList([...List, Task.trim()]);
         setTask('');
@@ -100,42 +118,69 @@ const App = () => {
       }
     } else
       Alert.alert('Please write your task first !', 'Then press add Button.');
+    Keyboard.dismiss();
   };
 
+  const MainMenu = ({route}) => {
+    useEffect(() => {
+      if (route.params != undefined && temp_Activeness == true) {
+        AsyncStorage.getItem('TaskList')
+          .then(data => {
+            data != null && setList(JSON.parse(data));
+          })
+          .catch(err => {
+            console.log(err);
+          });
+        temp_Activeness = false;
+      }
+    }, [route.params]);
+
+    global.navigation = useNavigation();
+    return (
+      <SafeAreaView style={styles.container}>
+        <TouchableWithoutFeedback
+          style={{flex: 1}}
+          onPress={() => {
+            Keyboard.dismiss();
+          }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{flex: 1}}>
+            {/* Title */}
+            <View style={styles.textWrapper}>
+              <Text style={styles.title}>Today's Task</Text>
+            </View>
+            {/* To Do List */}
+            <View style={styles.ListWrapper}>
+              <FlatList data={List} renderItem={renderItem} />
+            </View>
+            {/* Adding Tasks Part */}
+            <View style={styles.ButtonWrapper}>
+              <TextInput
+                style={styles.TextInput}
+                value={Task}
+                onChangeText={text => setTask(text)}
+                placeholder="Write your tasks here..."
+                placeholderTextColor={'gray'}
+              />
+              <TouchableOpacity style={styles.Button} onPress={AddTask}>
+                <Text style={styles.ButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      </SafeAreaView>
+    );
+  };
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableWithoutFeedback
-        style={{flex: 1}}
-        onPress={() => {
-          Keyboard.dismiss();
-        }}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
-          {/* Title */}
-          <View style={styles.textWrapper}>
-            <Text style={styles.title}>Today's Task</Text>
-          </View>
-          {/* To Do List */}
-          <View style={styles.ListWrapper}>
-            <FlatList data={List} renderItem={renderItem} />
-          </View>
-          {/* Adding Tasks Part */}
-          <View style={styles.ButtonWrapper}>
-            <TextInput
-              style={styles.TextInput}
-              value={Task}
-              onChangeText={text => setTask(text)}
-              placeholder="Write your tasks here..."
-              placeholderTextColor={'gray'}
-            />
-            <TouchableOpacity style={styles.Button} onPress={AddTask}>
-              <Text style={styles.ButtonText}>Add</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="MainMenu"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="MainMenu" component={MainMenu} />
+        <Stack.Screen name="EditTask" component={EditTask} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
@@ -145,8 +190,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#e1e6eb',
   },
   textWrapper: {
-    marginTop: 50,
+    marginTop: 30,
     alignItems: 'center',
+    top: 10,
   },
   title: {
     fontSize: 25,
