@@ -159,45 +159,84 @@ const App = () => {
     }, [Task]);
 
     global.navigation = useNavigation();
-    return (
-      <SafeAreaView style={styles.container}>
-        <TouchableWithoutFeedback
-          style={{flex: 1}}
-          onPress={() => {
-            Keyboard.dismiss();
-          }}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{flex: 1}}>
-            {/* Title */}
-            <View style={styles.textWrapper}>
-              <Text style={styles.title}>Today's Task</Text>
-            </View>
-            {/* To Do List */}
-            <View style={styles.ListWrapper}>
-              <FlatList data={List} renderItem={renderItem} />
-              {console.log('re-render main#####')}
-            </View>
-            {/* Adding Tasks Part */}
-            <View style={styles.ButtonWrapper}>
-              <TextInput
-                ref={searchInput}
-                style={styles.TextInput}
-                value={Task}
-                onChangeText={text => setTask(text)}
-                placeholder="Write your tasks here..."
-                placeholderTextColor={'gray'}
-              />
-              {/* <TextInputArea Task={Task} changeText={text => setTask(text)} /> */}
-              {/* {TextInputArea(Task, text => setTask(text))} */}
-              <TouchableOpacity style={styles.Button} onPress={AddTask}>
-                <Text style={styles.ButtonText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
-      </SafeAreaView>
-    );
+    {
+      return Task.length == 0 ? (
+        <SafeAreaView style={styles.container}>
+          <TouchableWithoutFeedback
+            style={{flex: 1}}
+            onPress={() => {
+              Keyboard.dismiss();
+            }}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{flex: 1}}>
+              {/* Title */}
+              <View style={styles.textWrapper}>
+                <Text style={styles.title}>Today's Task</Text>
+              </View>
+              {/* To Do List */}
+              <View style={styles.ListWrapper}>
+                <FlatList data={List} renderItem={renderItem} />
+                {console.log('re-render main#####')}
+              </View>
+              {/* Adding Tasks Part */}
+              <View style={styles.ButtonWrapper}>
+                <TextInput
+                  ref={searchInput}
+                  style={styles.TextInput}
+                  value={Task}
+                  onChangeText={text => setTask(text)}
+                  placeholder="Write your tasks here..."
+                  placeholderTextColor={'gray'}
+                />
+                {/* <TextInputArea Task={Task} changeText={text => setTask(text)} /> */}
+                {/* {TextInputArea(Task, text => setTask(text))} */}
+                <TouchableOpacity style={styles.Button} onPress={AddTask}>
+                  <Text style={styles.ButtonText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
+          </TouchableWithoutFeedback>
+        </SafeAreaView>
+      ) : (
+        <SafeAreaView style={styles.container}>
+          <TouchableWithoutFeedback
+            style={{flex: 1}}
+            onPress={() => {
+              Keyboard.dismiss();
+            }}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{flex: 1}}>
+              {/* Title */}
+              <View style={styles.textWrapper}>
+                <Text style={styles.title}>Today's Task</Text>
+              </View>
+              {/* To Do List */}
+              <View style={styles.ListWrapper}>
+                {console.log('re-render mainN#####')}
+              </View>
+              {/* Adding Tasks Part */}
+              <View style={styles.ButtonWrapper}>
+                <TextInput
+                  ref={searchInput}
+                  style={styles.TextInput}
+                  value={Task}
+                  onChangeText={text => setTask(text)}
+                  placeholder="Write your tasks here..."
+                  placeholderTextColor={'gray'}
+                />
+                {/* <TextInputArea Task={Task} changeText={text => setTask(text)} /> */}
+                {/* {TextInputArea(Task, text => setTask(text))} */}
+                <TouchableOpacity style={styles.Button} onPress={AddTask}>
+                  <Text style={styles.ButtonText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
+          </TouchableWithoutFeedback>
+        </SafeAreaView>
+      );
+    }
   };
   return (
     <NavigationContainer>
