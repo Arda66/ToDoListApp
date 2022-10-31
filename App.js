@@ -35,49 +35,45 @@ const App = () => {
       .catch(err => {
         console.log(err);
       });
-    console.log('main useEffect');
   }, []);
 
   const renderItem = ({item, index}) => {
-    {
-      return Task.length == 0 ? (
-        <View style={styles.ItemWrapper}>
-          <Text
-            style={[
-              {maxWidth: '75%', color: 'black', letterSpacing: 0.2},
-              isDeleted === true &&
-                index == currIndex && {
-                  textDecorationLine: 'line-through',
-                },
-            ]}>
-            {index + 1}-) {item}
-          </Text>
-          <TouchableOpacity
-            style={{position: 'absolute', left: '80%'}}
-            onPress={() => {
-              navigation.navigate('EditTask', {
-                Task: item,
-                index: index,
-                NewList: List,
-              });
-            }}>
-            {console.log('re-render Item')}
-            <AntDesignIcon name="edit" size={30} color="gray" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              DeleteItem(item, index);
-            }}>
-            <MaterialCommunityIcon name="delete" size={30} color="red" />
-          </TouchableOpacity>
-        </View>
-      ) : null;
-    }
+    return (
+      <View style={styles.ItemWrapper}>
+        <Text
+          style={[
+            {maxWidth: '75%', color: 'black', letterSpacing: 0.2},
+            isDeleted === true &&
+              index == currIndex && {
+                textDecorationLine: 'line-through',
+              },
+          ]}>
+          {index + 1}-) {item}
+        </Text>
+        <TouchableOpacity
+          style={{position: 'absolute', left: '80%'}}
+          onPress={() => {
+            navigation.navigate('EditTask', {
+              Task: item,
+              index: index,
+              NewList: List,
+            });
+          }}>
+          <AntDesignIcon name="edit" size={30} color="gray" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            DeleteItem(item, index);
+          }}>
+          <MaterialCommunityIcon name="delete" size={30} color="red" />
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   const DeleteItem = (item, index) => {
     Alert.alert(
-      'Are you sure you want to delete this task?',
+      'Are you sure you want to delete this item?',
       `Task : ${item} `,
       [
         {
@@ -104,7 +100,6 @@ const App = () => {
     );
   };
   const AddTask = async () => {
-    console.log('Task : ', Task);
     if (Task.trim() != 0 && Task.length > 0) {
       if (List.includes(Task)) {
         Alert.alert(
@@ -126,19 +121,6 @@ const App = () => {
     Keyboard.dismiss();
   };
 
-  // const TextInputArea = ({Task, changeText}) => {
-  //   return (
-  //     <TextInput
-  //       style={styles.TextInput}
-  //       value={Task}
-  //       onChangeText={text => changeText}
-  //       placeholder="Write your tasks here..."
-  //       placeholderTextColor={'gray'}
-  //     />
-  //   );
-  // };
-  const searchInput = React.useRef(null);
-
   const MainMenu = ({route}) => {
     useEffect(() => {
       if (route.params != undefined && temp_Activeness == true) {
@@ -149,14 +131,9 @@ const App = () => {
           .catch(err => {
             console.log(err);
           });
-        console.log('MainMenu useEffect');
         temp_Activeness = false;
       }
     }, [route.params]);
-
-    useEffect(() => {
-      if (Task.length != 0) searchInput?.current?.focus();
-    }, [Task]);
 
     global.navigation = useNavigation();
     return (
@@ -176,20 +153,16 @@ const App = () => {
             {/* To Do List */}
             <View style={styles.ListWrapper}>
               <FlatList data={List} renderItem={renderItem} />
-              {console.log('re-render main#####')}
             </View>
             {/* Adding Tasks Part */}
             <View style={styles.ButtonWrapper}>
               <TextInput
-                ref={searchInput}
                 style={styles.TextInput}
                 value={Task}
                 onChangeText={text => setTask(text)}
                 placeholder="Write your tasks here..."
                 placeholderTextColor={'gray'}
               />
-              {/* <TextInputArea Task={Task} changeText={text => setTask(text)} /> */}
-              {/* {TextInputArea(Task, text => setTask(text))} */}
               <TouchableOpacity style={styles.Button} onPress={AddTask}>
                 <Text style={styles.ButtonText}>Add</Text>
               </TouchableOpacity>
